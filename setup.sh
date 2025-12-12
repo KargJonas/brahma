@@ -31,7 +31,8 @@ yay -S --needed --noconfirm \
     obsidian \
     drawio-desktop \
     signal-desktop \
-    visual-studio-code-bin
+    visual-studio-code-bin \
+    localsend-bin
 
 # Development packages
 sudo pacman -Syu --needed --noconfirm \
@@ -53,12 +54,13 @@ rm -rf "$TEMP_DIR"
 sudo fc-cache -fv
 msg "Ubuntu Mono Nerd Font installed successfully."
 
-# Docker installation
-sudo pacman -Syu --needed --noconfirm docker
-sudo systemctl enable --now docker.service
-sudo usermod -aG docker "$USER"
+# LocalSend firewall config
+sudo firewall-cmd --zone=public --add-port=53317/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=53317/udp --permanent
+sudo firewall-cmd --reload
 
 # Virtualization stuff
+sudo pacman -S podman distrobox
 yay -S --needed --noconfirm qemu-full virt-manager virt-viewer libguestfs libvirt edk2-ovmf swtpm
 sudo systemctl enable --now libvirtd.service
 sudo usermod -aG libvirt "$USER"
