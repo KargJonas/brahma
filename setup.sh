@@ -24,12 +24,14 @@ sudo pacman -Syu --needed --noconfirm \
     wireplumber \
     power-profiles-daemon \
     stow \
-    vlc
+    vlc \
+    discord
 
 yay -S --needed --noconfirm \
     obsidian \
     drawio-desktop \
-    signal-desktop
+    signal-desktop \
+    visual-studio-code-bin
 
 # Development packages
 sudo pacman -Syu --needed --noconfirm \
@@ -37,6 +39,19 @@ sudo pacman -Syu --needed --noconfirm \
     git \
     wget \
     curl
+
+# Ubuntu Mono Nerd Font installation (global)
+FONT_DIR="/usr/share/fonts/NerdFonts"
+FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/UbuntuMono.zip"
+TEMP_DIR=$(mktemp -d)
+
+msg "Installing Ubuntu Mono Nerd Font globally..."
+wget -q --show-progress "$FONT_URL" -O "$TEMP_DIR/UbuntuMono.zip"
+sudo mkdir -p "$FONT_DIR"
+sudo unzip -q "$TEMP_DIR/UbuntuMono.zip" -d "$FONT_DIR/UbuntuMono"
+rm -rf "$TEMP_DIR"
+sudo fc-cache -fv
+msg "Ubuntu Mono Nerd Font installed successfully."
 
 # Docker installation
 sudo pacman -Syu --needed --noconfirm docker
