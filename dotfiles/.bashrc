@@ -45,6 +45,15 @@ function __docker_ps1 () {
   if [ -f /.dockerenv ]; then echo -e '\033[01;32m[\033[01;36mdocker\033[01;32m] '; fi
 }
 
+function __container_ps1 () {
+  if [ -n "$DISTROBOX_ENTER_PATH" ]; then
+    echo -e '\033[01;32m[\033[01;36m'"${CONTAINER_ID:-distrobox}"'\033[01;32m] '
+  elif [ -f /run/.toolboxenv ]; then
+    local name=$(grep -oP '(?<=name=")[^"]+' /run/.containerenv 2>/dev/null || echo "toolbox")
+    echo -e '\033[01;32m[\033[01;36m'"$name"'\033[01;32m] '
+  fi
+}
+
 # Checks if user is root and returns root indicator for PS1
 function __root_ps1 () {
   if [[ $(id -u) == 0 ]]; then echo -e '\033[01;32m[\033[01;35mroot\033[01;32m]'; fi
@@ -73,7 +82,7 @@ esac
 # This is where the PS1 is stitched together.
 # The completed string undergoes further decoding by the shell program
 # before being displayed (e.g. \w escape character)
-PS1='$(__root_ps1)$(__docker_ps1)\[\033[01;32m\][\[\033[01;34m\]\w\[\033[01;32m\]]\[\033[01;33m\]$(__safe_git_ps1)\n \[\033[01;31m\]⇋\[\033[00m\] '
+PS1='$(__root_ps1)$(__container_ps1)$(__docker_ps1)\[\033[01;32m\][\[\033[01;34m\]\w\[\033[01;32m\]]\[\033[01;33m\]$(__safe_git_ps1)\n \[\033[01;31m\]⇋\[\033[00m\] '
 
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
