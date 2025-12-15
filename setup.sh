@@ -1,11 +1,10 @@
 #!/bin/bash
 set -euo pipefail
-msg() { printf '\n\033[33;1m  Sys Info\033[00m  %s\n\n' "$*"; }
+msg() { printf '\n\033[33;1m  Setup\033[00m  %s\n\n' "$*"; }
 
-# Go to the location of this script
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Misc packages
+msg 'Installing packages'
 sudo pacman -Syu --needed --noconfirm \
     ly \
     sway \
@@ -34,47 +33,63 @@ yay -S --needed --noconfirm \
     visual-studio-code-bin \
     localsend-bin
 
-# Development packages
 sudo pacman -Syu --needed --noconfirm \
     base-devel \
     git \
     wget \
     curl
 
-# Ubuntu Mono Nerd Font installation (global)
-FONT_DIR="/usr/share/fonts/NerdFonts"
-FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/UbuntuMono.zip"
-TEMP_DIR=$(mktemp -d)
+if fc-list | grep -qi "UbuntuMono Nerd Font"; then
+  msg 'Fonts already installed'
+else
+  msg 'Installing fonts'
+  FONT_DIR="/usr/share/fonts/NerdFonts"
+  FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/UbuntuMono.zip"
+  TEMP_DIR=$(mktemp -d)
+  wget -q --show-progress "$FONT_URL" -O "$TEMP_DIR/UbuntuMono.zip"
+  sudo mkdir -p "$FONT_DIR"
+  sudo unzip -q "$TEMP_DIR/UbuntuMono.zip" -d "$FONT_DIR/UbuntuMono"
+  rm -rf "$TEMP_DIR"
+  sudo fc-cache -fv
+fi
 
-msg "Installing Ubuntu Mono Nerd Font globally..."
-wget -q --show-progress "$FONT_URL" -O "$TEMP_DIR/UbuntuMono.zip"
-sudo mkdir -p "$FONT_DIR"
-sudo unzip -q "$TEMP_DIR/UbuntuMono.zip" -d "$FONT_DIR/UbuntuMono"
-rm -rf "$TEMP_DIR"
-sudo fc-cache -fv
-msg "Ubuntu Mono Nerd Font installed successfully."
-
-# LocalSend firewall config
+msg 'Configuring firewall'
 sudo firewall-cmd --zone=public --add-port=53317/tcp --permanent
 sudo firewall-cmd --zone=public --add-port=53317/udp --permanent
 sudo firewall-cmd --reload
 
-# Virtualization stuff
+msg 'Setting up virtualization'
 sudo pacman -S podman distrobox
 yay -S --needed --noconfirm qemu-full virt-manager virt-viewer libguestfs libvirt edk2-ovmf swtpm
 sudo systemctl enable --now libvirtd.service
-sudo usermod -aG libvirt "$USER"
 
-# Backup existing config files
-find dotfiles -type f | while read -r file; do
-  target="$HOME/${file#dotfiles/}"
+if groups | grep -q '\blibvirt\b'; then
+  msg 'Already in libvirt group'
+else
+  sudo usermod -aG libvirt "$USER"
+  msg 'Added to libvirt group (re-login required)'
+fi
+
+msg 'Backing up existing files'
+mkdir -p .backups
+find home -type f | while read -r file; do
+  target="$HOME/${file#home/}"
   if [ -e "$target" ] && [ ! -L "$target" ]; then
-    mv "$target" "${target}.backup.$(date +%s)"
+    backup=".backups/$(basename "$target")"
+    if [ ! -e "$backup" ]; then
+      mv "$target" "$backup"
+      msg "Backed up $(basename "$target")"
+    fi
   fi
 done
 
-sudo chmod +x scripts/*
-mkdir -p ~/bin ~/opt
-stow -t ~ dotfiles
+msg 'Setting up scripts'
+chmod +x scripts/*
 
-msg "Setup complete."
+msg 'Creating directories'
+mkdir -p ~/bin ~/opt
+
+msg 'Creating symlinks'
+stow -t ~ --restow home
+
+msg 'Setup complete'

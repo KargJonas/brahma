@@ -5,8 +5,8 @@ Single-command system setup.
 ## What it does
 
 - Installs packages (pacman + yay)
-- Symlinks dotfiles from `dotfiles/` to `~/`
-- Enables Docker and libvirt
+- Symlinks dotfiles from `home/` to `~/`
+- Enables podman and libvirt
 - Adds `scripts/` to PATH
 
 ## Install
@@ -27,9 +27,9 @@ brahma/
 ├── scripts/      # Utility scripts (in PATH)
 │   ├── dumpdir
 │   └── sys
-└── dotfiles/     # Config files (symlinked to ~/)
+└── home/         # Config files (symlinked to ~/)
     ├── .bashrc
     └── .config/
 ```
 
-Dotfiles are symlinked - editing `~/.bashrc` edits the repo directly.
+Config files are symlinked - editing `~/.bashrc` edits the repo directly.

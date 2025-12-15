@@ -148,9 +148,9 @@ alias agr='sudo apt-get remove'
 alias agu='sudo apt-get update'
 
 # path config
-export PATH="/home/jonas/code/brahma/scripts:$PATH"
-export PATH="/home/jonas/bin:$PATH"
-export PATH="/home/jonas/.local/bin:$PATH"
+export PATH="$HOME/code/brahma/scripts:$PATH"
+export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/nvim-linux-x86_64/bin:$PATH"
 export PATH="/snap/bin:$PATH"
 
