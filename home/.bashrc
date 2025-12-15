@@ -148,7 +148,7 @@ alias agr='sudo apt-get remove'
 alias agu='sudo apt-get update'
 
 # path config
-export PATH="$HOME/code/brahma/scripts:$PATH"
+export PATH="$HOME/brahma/scripts:$PATH"
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/nvim-linux-x86_64/bin:$PATH"
