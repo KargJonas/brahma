@@ -2,6 +2,7 @@
 set -euo pipefail
 msg() { printf '\n\033[33;1m  Info\033[00m  %s\n\n' "$*"; }
 
+sudo -v
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 msg 'Installing packages'
@@ -84,20 +85,23 @@ sudo firewall-cmd --zone=public --add-port=53317/udp --permanent # LocalSend
 sudo firewall-cmd --reload
 
 msg 'Backing up existing files'
-mkdir -p .backups
 BRAHMA_DIR="$(pwd)"
-find home -type f | while read -r file; do
+BACKUP_DIR=".backups/$(date +%Y%m%d_%H%M%S)"
+NEEDS_BACKUP=false
+
+while read -r file; do
   target="$HOME/${file#home/}"
   [ ! -e "$target" ] && continue
   [ -L "$target" ] && continue
-  realpath_target=$(realpath "$target" 2>/dev/null || echo "$target")
-  [[ "$realpath_target" == "$BRAHMA_DIR/home/"* ]] && continue
-  backup=".backups/$(basename "$target")"
-  if [ ! -e "$backup" ]; then
-    mv "$target" "$backup"
-    msg "Backed up $(basename "$target")"
-  fi
-done
+  [[ "$(realpath "$target" 2>/dev/null || echo "$target")" == "$BRAHMA_DIR/home/"* ]] && continue
+
+  [ "$NEEDS_BACKUP" = false ] && mkdir -p "$BACKUP_DIR" && NEEDS_BACKUP=true
+
+  backup="$BACKUP_DIR/${target#$HOME/}"
+  mkdir -p "$(dirname "$backup")"
+  mv "$target" "$backup"
+  msg "Backed up ${target#$HOME/}"
+done < <(find home -type f)
 
 msg 'Setting up scripts'
 chmod +x scripts/*
