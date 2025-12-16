@@ -6,6 +6,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 msg 'Installing packages'
 sudo pacman -Syu --needed --noconfirm \
+    base-devel \
+    git \
+    wget \
+    curl
     ly \
     sway \
     waybar \
@@ -28,19 +32,16 @@ sudo pacman -Syu --needed --noconfirm \
     qbittorrent \
     vlc-plugin-ffmpeg
 
+# might switch to snap/flatpak someday
+# because of AUR security concerns
 yay -S --needed --noconfirm \
     obsidian \
     drawio-desktop \
     signal-desktop \
     visual-studio-code-bin \
     localsend-bin \
-    ivpn ivpn-ui
-
-sudo pacman -Syu --needed --noconfirm \
-    base-devel \
-    git \
-    wget \
-    curl
+    ivpn ivpn-ui \
+    spotify
 
 if fc-list | grep -qi "UbuntuMono Nerd Font"; then
   msg 'Fonts already installed'

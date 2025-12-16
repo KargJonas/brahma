@@ -1,0 +1,7 @@
+[user]
+	email = 30984652+KargJonas@users.noreply.github.com
+	name = Jonas Karg
+[core]
+	editor = vim
+[pull]
+	rebase = true
