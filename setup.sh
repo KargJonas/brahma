@@ -24,14 +24,17 @@ sudo pacman -Syu --needed --noconfirm \
     power-profiles-daemon \
     stow \
     vlc \
-    discord
+    discord \
+    qbittorrent \
+    vlc-plugin-ffmpeg
 
 yay -S --needed --noconfirm \
     obsidian \
     drawio-desktop \
     signal-desktop \
     visual-studio-code-bin \
-    localsend-bin
+    localsend-bin \
+    ivpn ivpn-ui
 
 sudo pacman -Syu --needed --noconfirm \
     base-devel \
