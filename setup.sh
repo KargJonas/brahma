@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-msg() { printf '\n\033[33;1m  Setup\033[00m  %s\n\n' "$*"; }
+msg() { printf '\n\033[33;1m  Info\033[00m  %s\n\n' "$*"; }
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
@@ -9,7 +9,7 @@ sudo pacman -Syu --needed --noconfirm \
     base-devel \
     git \
     wget \
-    curl
+    curl \
     ly \
     sway \
     waybar \
@@ -30,7 +30,10 @@ sudo pacman -Syu --needed --noconfirm \
     vlc \
     discord \
     qbittorrent \
-    vlc-plugin-ffmpeg
+    vlc-plugin-ffmpeg \
+    podman \
+    distrobox \
+    github-cli
 
 # might switch to snap/flatpak someday
 # because of AUR security concerns
@@ -43,11 +46,22 @@ yay -S --needed --noconfirm \
     ivpn ivpn-ui \
     spotify
 
-if fc-list | grep -qi "UbuntuMono Nerd Font"; then
+msg 'Setting up virtualization'
+yay -S --needed --noconfirm \
+  qemu-full \
+  virt-manager \
+  virt-viewer \
+  libguestfs \
+  libvirt \
+  edk2-ovmf \
+  swtpm
+sudo systemctl enable --now libvirtd.service
+
+FONT_DIR="/usr/share/fonts/NerdFonts"
+if [ -d "$FONT_DIR/UbuntuMono" ]; then
   msg 'Fonts already installed'
 else
   msg 'Installing fonts'
-  FONT_DIR="/usr/share/fonts/NerdFonts"
   FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/UbuntuMono.zip"
   TEMP_DIR=$(mktemp -d)
   wget -q --show-progress "$FONT_URL" -O "$TEMP_DIR/UbuntuMono.zip"
@@ -57,16 +71,6 @@ else
   sudo fc-cache -fv
 fi
 
-msg 'Configuring firewall'
-sudo firewall-cmd --zone=public --add-port=53317/tcp --permanent
-sudo firewall-cmd --zone=public --add-port=53317/udp --permanent
-sudo firewall-cmd --reload
-
-msg 'Setting up virtualization'
-sudo pacman -S podman distrobox
-yay -S --needed --noconfirm qemu-full virt-manager virt-viewer libguestfs libvirt edk2-ovmf swtpm
-sudo systemctl enable --now libvirtd.service
-
 if groups | grep -q '\blibvirt\b'; then
   msg 'Already in libvirt group'
 else
@@ -74,16 +78,24 @@ else
   msg 'Added to libvirt group (re-login required)'
 fi
 
+msg 'Configuring firewall'
+sudo firewall-cmd --zone=public --add-port=53317/tcp --permanent # LocalSend
+sudo firewall-cmd --zone=public --add-port=53317/udp --permanent # LocalSend
+sudo firewall-cmd --reload
+
 msg 'Backing up existing files'
 mkdir -p .backups
+BRAHMA_DIR="$(pwd)"
 find home -type f | while read -r file; do
   target="$HOME/${file#home/}"
-  if [ -e "$target" ] && [ ! -L "$target" ]; then
-    backup=".backups/$(basename "$target")"
-    if [ ! -e "$backup" ]; then
-      mv "$target" "$backup"
-      msg "Backed up $(basename "$target")"
-    fi
+  [ ! -e "$target" ] && continue
+  [ -L "$target" ] && continue
+  realpath_target=$(realpath "$target" 2>/dev/null || echo "$target")
+  [[ "$realpath_target" == "$BRAHMA_DIR/home/"* ]] && continue
+  backup=".backups/$(basename "$target")"
+  if [ ! -e "$backup" ]; then
+    mv "$target" "$backup"
+    msg "Backed up $(basename "$target")"
   fi
 done
 
