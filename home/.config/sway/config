@@ -80,6 +80,9 @@ input type:keyboard {
     # File explorer
     bindsym $mod+n exec nautilus
 
+    # Screenshots
+    bindsym $mod+Print exec grim -g "$(slurp)" - | tee "~/Pictures/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png" | wl-copy
+
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
     # Despite the name, also works for non-floating windows.
