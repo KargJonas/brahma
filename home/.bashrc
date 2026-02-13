@@ -142,10 +142,14 @@ alias dcl='docker compose logs -f'
 alias dcbu='docker compose up -d --build'
 alias dcbul='docker compose up -d --build && docker compose logs -f'
 
+alias dbe='distrobox enter'
+
 # distro specific aliases
 alias agi='sudo apt-get install'
 alias agr='sudo apt-get remove'
 alias agu='sudo apt-get update'
+alias pmi='sudo pacman -S'
+alias pmr='sudo pacman -R'
 
 # path config
 export PATH="$HOME/brahma/scripts:$PATH"
@@ -153,8 +157,14 @@ export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/opt/nvim-linux-x86_64/bin:$PATH"
 export PATH="/snap/bin:$PATH"
+export PATH="$HOME/opt/oss-cad-suite/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
 
 # Enable bash hashing
 set -o hashall
 
 [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

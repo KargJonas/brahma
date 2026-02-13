@@ -34,7 +34,8 @@ sudo pacman -Syu --needed --noconfirm \
     vlc-plugin-ffmpeg \
     podman \
     distrobox \
-    github-cli
+    github-cli \
+    timeshift
 
 # might switch to snap/flatpak someday
 # because of AUR security concerns
