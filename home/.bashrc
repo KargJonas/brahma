@@ -12,12 +12,6 @@
 # Dependencies:
 # git, wget
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
 # don't put duplicate lines or lines starting with space in the history.
 # HISTCONTROL=ignoreboth
 
@@ -118,7 +112,7 @@ function lsn() {
 alias ls='ls --color=auto'
 alias la='ls -a'
 alias ll='ls -l'
-alias lln='ls -ll | head -n '
+alias lln='ls -llt | head -n '
 
 alias clip='wl-copy'
 alias vim='nvim'
