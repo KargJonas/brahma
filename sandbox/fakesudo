@@ -1,0 +1,11 @@
+#!/bin/bash
+# We're already root inside the sandbox, so sudo is unnecessary.
+# Strip sudo's own options and run the requested command unprivileged-as-root.
+while [[ "${1:-}" == -* ]]; do
+    case "$1" in
+        -u|-g|-U|-p|-C|-D|-R|-T|-h) shift 2 ;;  # options that consume an argument
+        --) shift; break ;;
+        *) shift ;;                              # boolean flags: -E -H -i -s -k ...
+    esac
+done
+exec "${@:-bash}"

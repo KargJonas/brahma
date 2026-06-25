@@ -28,6 +28,9 @@ shopt -s checkwinsize
 # match all files and zero or more directories and subdirectories.
 shopt -s globstar
 
+# Enable bash hashing
+set -o hashall
+
 # Used for showing git information in the PS1
 source ~/.git-prompt.sh
 
@@ -126,6 +129,7 @@ alias cls='clear'
 alias chx='sudo chmod +x'
 alias gco='git checkout'
 alias gpo='git push origin'
+alias gcane='git commit --amend --no-edit'
 
 alias edc='enter_docker_container'
 alias dcd='docker compose down'
@@ -137,6 +141,7 @@ alias dcbu='docker compose up -d --build'
 alias dcbul='docker compose up -d --build && docker compose logs -f'
 
 alias dbe='distrobox enter'
+alias chrome='distrobox enter chrome -- google-chrome-stable'
 
 # distro specific aliases
 alias agi='sudo apt-get install'
@@ -144,6 +149,11 @@ alias agr='sudo apt-get remove'
 alias agu='sudo apt-get update'
 alias pmi='sudo pacman -S'
 alias pmr='sudo pacman -R'
+
+# sandbox-ignore
+
+# sandbox
+source ~/brahma/sandbox/sandbox.sh
 
 # path config
 export PATH="$HOME/brahma/scripts:$PATH"
@@ -153,12 +163,12 @@ export PATH="/opt/nvim-linux-x86_64/bin:$PATH"
 export PATH="/snap/bin:$PATH"
 export PATH="$HOME/opt/oss-cad-suite/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
-
-# Enable bash hashing
-set -o hashall
+export PATH="$HOME/opt/emsdk:$PATH"
+export PATH="$HOME/opt/emsdk/upstream/emscripten:$PATH"
 
 [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
