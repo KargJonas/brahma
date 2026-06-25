@@ -121,6 +121,18 @@ sys_monitor() {
   fi
 }
 
+sys_usage() {
+  printf '\n\033[33;1m  sys\033[00m  system control  -  usage: sys <command> [arg]\n\n'
+  printf '  \033[1mpower\033[00m      p   poweroff|p  reboot|r  suspend|s  lock|l  exit|e\n'
+  printf '  \033[1mbrightness\033[00m b   <10-100>  up|u  down|d  max|h  min|l\n'
+  printf '  \033[1mgamma\033[00m      g   <1000-25000>  reset|r\n'
+  printf '  \033[1mvolume\033[00m     v   <0-100>  up|u  down|d  mute|m  toggle|t\n'
+  printf '  \033[1mprofile\033[00m    f   performance|p  balanced|b  power-saver|s\n'
+  printf '  \033[1mscreenshot\033[00m s   region select -> clipboard + ~/Pictures\n'
+  printf '  \033[1mmonitor\033[00m    m   open display configurator\n'
+  printf '  \033[1musage\033[00m      h   show this help\n\n'
+}
+
 case "$1" in
   power      | p) sys_power "$2" ;;
   brightness | b) sys_brightness "$2" ;;
@@ -129,4 +141,6 @@ case "$1" in
   profile    | f) sys_profile "$2" ;;
   screenshot | s) sys_screenshot ;;
   monitor    | m) sys_monitor ;;
+  usage | help | h | -h | --help | '') sys_usage ;;
+  *) msg "Unknown command: $1"; sys_usage ;;
 esac
