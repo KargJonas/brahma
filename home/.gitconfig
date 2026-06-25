@@ -5,3 +5,7 @@
 	editor = vim
 [pull]
 	rebase = true
+
+# If the repo is inside the alt-code/, use the alt config
+[includeIf "gitdir:~/alt-code/"]
+    path = ~/.gitconfig-alt

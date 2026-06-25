@@ -12,7 +12,7 @@ size = 15
 [window]
 padding.x = 14
 padding.y = 14
-decorations = "None"
+# decorations = "None"
 
 [keyboard]
 bindings = [

@@ -22,10 +22,10 @@ set $term alacritty
 set $menu fuzzel
 
 
-
 ################################
 # Clipboard behavior
 # 
+
 # Use only one clipboard (disable PRIMARY selection / middle-click paste buffer)
 primary_selection disabled
 # Middle click pastes from regular CLIPBOARD (same data as Ctrl+V)
@@ -126,6 +126,14 @@ bindsym $mod+Shift+r reload
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
 
+
+################################
+# Looks:
+#
+
+# default_border pixel 2
+# default_floating_border pixel 2
+font pango:Inter 8
 
 ################################
 # Moving around:
@@ -282,7 +290,8 @@ bindsym Print exec grim
 
 # Read `man 5 sway-bar` for more information about this section.
 bar {
-    position top
+    # position top
+    position bottom
 
     # When the status_command prints a new line to stdout, swaybar updates.
     status_command i3status
