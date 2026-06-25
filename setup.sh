@@ -23,6 +23,7 @@ sudo pacman -Syu --needed --noconfirm \
     gimp \
     alacritty \
     brightnessctl \
+    ddcutil \
     grim \
     slurp \
     wl-clipboard \
@@ -79,6 +80,16 @@ if groups | grep -q '\blibvirt\b'; then
 else
   sudo usermod -aG libvirt "$USER"
   msg 'Added to libvirt group (re-login required)'
+fi
+
+# External monitor brightness via DDC/CI (ddcutil). The package auto-loads
+# i2c-dev on boot; modprobe makes it work in the current session too.
+sudo modprobe i2c-dev
+if groups | grep -q '\bi2c\b'; then
+  msg 'Already in i2c group'
+else
+  sudo usermod -aG i2c "$USER"
+  msg 'Added to i2c group for external monitor brightness (re-login required)'
 fi
 
 msg 'Configuring firewall'

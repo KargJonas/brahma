@@ -24,17 +24,28 @@ sys_power() {
   esac
 }
 
+# Apply a DDC/CI brightness op (VCP 0x10) to every external monitor.
+# No-op if ddcutil is missing or no DDC-capable display is detected.
+ddc_brightness() {
+  command -v ddcutil >/dev/null || return 0
+  local d
+  for d in $(ddcutil detect --brief 2>/dev/null | grep -oP 'Display \K[0-9]+'); do
+    ddcutil -d "$d" setvcp 10 "$@" >/dev/null 2>&1
+  done
+}
+
 sys_brightness() {
   command -v brightnessctl >/dev/null || { msg 'Install brightnessctl'; return 1; }
   if [[ "$1" =~ ^[0-9]+$ ]]; then
     local n=$1; (( n<10 )) && n=10; (( n>100 )) && n=100
     brightnessctl set "${n}%"
+    ddc_brightness "$n"
   else
     case "$1" in
-      up   | u) brightnessctl set +10% ;;
-      down | d) brightnessctl set 10%- ;;
-      max  | h) brightnessctl set 100% ;;
-      min  | l) brightnessctl set 10% ;;
+      up   | u) brightnessctl set +10%; ddc_brightness + 10 ;;
+      down | d) brightnessctl set 10%-; ddc_brightness - 10 ;;
+      max  | h) brightnessctl set 100%; ddc_brightness 100 ;;
+      min  | l) brightnessctl set 10%;  ddc_brightness 10 ;;
     esac
   fi
   local p; p=$(brightnessctl -m | awk -F, '{print $4}')
