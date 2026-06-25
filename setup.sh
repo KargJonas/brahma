@@ -17,6 +17,7 @@ sudo pacman -Syu --needed --noconfirm \
     wmenu \
     i3status \
     nwg-displays \
+    gammastep \
     neovim \
     firefox \
     gimp \

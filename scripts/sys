@@ -41,6 +41,24 @@ sys_brightness() {
   msg "Brightness ${p}"
 }
 
+sys_gamma() {
+  command -v gammastep >/dev/null || { msg 'Install gammastep'; return 1; }
+  case "$1" in
+    reset | r)
+      pkill -x gammastep
+      msg 'Gamma reset'
+      ;;
+    *)
+      if [[ "$1" =~ ^[0-9]+$ ]]; then
+        local n=$1; (( n<1000 )) && n=1000; (( n>25000 )) && n=25000
+        pkill -x gammastep
+        setsid gammastep -P -O "$n" >/dev/null 2>&1 &
+        msg "Gamma ${n}K"
+      fi
+      ;;
+  esac
+}
+
 sys_volume() {
   command -v wpctl >/dev/null || { msg 'Install wpctl (wireplumber)'; return 1; }
   local sink='@DEFAULT_AUDIO_SINK@'
@@ -95,6 +113,7 @@ sys_monitor() {
 case "$1" in
   power      | p) sys_power "$2" ;;
   brightness | b) sys_brightness "$2" ;;
+  gamma      | g) sys_gamma "$2" ;;
   volume     | v) sys_volume "$2" ;;
   profile    | f) sys_profile "$2" ;;
   screenshot | s) sys_screenshot ;;
