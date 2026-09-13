@@ -97,7 +97,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
-function enter_docker_container () {
+function enter_docker_container() {
   docker exec -it $1 /bin/bash
 }
 
@@ -155,6 +155,10 @@ alias pmr='sudo pacman -R'
 # sandbox
 source ~/brahma/sandbox/sandbox.sh
 
+# default editor
+export EDITOR=vim
+export VISUAL=vim
+
 # path config
 export PATH="$HOME/brahma/scripts:$PATH"
 export PATH="$HOME/bin:$PATH"
@@ -172,3 +176,4 @@ export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+. "$HOME/.cargo/env"
