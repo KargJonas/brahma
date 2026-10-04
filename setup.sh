@@ -15,6 +15,7 @@ sudo pacman -Syu --needed --noconfirm \
     sway \
     waybar \
     wmenu \
+    fuzzel \
     i3status \
     mako \
     batsignal \

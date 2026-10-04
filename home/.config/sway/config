@@ -18,7 +18,7 @@ set $down k
 set $up l
 set $right odiaeresis
 set $term alacritty
-# set $menu wmenu-run
+# set $menu wmenu-run -f "Ubuntu Mono Nerd Font 13" -N 1e2229 -n abb2bf -M 61afef -m 1e2229 -S 3e4451 -s c8ccd4
 set $menu env XDG_DATA_DIRS=/home/jonas/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share fuzzel
 
 
