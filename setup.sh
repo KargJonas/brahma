@@ -16,6 +16,8 @@ sudo pacman -Syu --needed --noconfirm \
     waybar \
     wmenu \
     i3status \
+    mako \
+    batsignal \
     nwg-displays \
     gammastep \
     neovim \

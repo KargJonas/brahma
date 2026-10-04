@@ -19,7 +19,7 @@ set $up l
 set $right odiaeresis
 set $term alacritty
 # set $menu wmenu-run
-set $menu fuzzel
+set $menu env XDG_DATA_DIRS=/home/jonas/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share fuzzel
 
 
 ################################
@@ -281,6 +281,13 @@ bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
 bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
 # Special key to take a screenshot with grim
 bindsym Print exec grim
+
+################################
+# Notifications & battery warnings
+#
+exec mako
+# warn at 20%, critical at 10%, hibernate at 5%
+exec batsignal -w 20 -c 10 -d 5 -D "systemctl hibernate"
 
 
 
