@@ -5,7 +5,15 @@
 	editor = vim
 [pull]
 	rebase = true
+[diff]
+	tool = nvimtabs
+[difftool]
+	prompt = false
 
 # If the repo is inside the alt-code/, use the alt config
 [includeIf "gitdir:~/alt-code/"]
     path = ~/.gitconfig-alt
+[alias]
+	dt = difftool -d
+[difftool "nvimtabs"]
+	cmd = nvim -c \"lua require('difftabs').open([[$LOCAL]], [[$REMOTE]])\"

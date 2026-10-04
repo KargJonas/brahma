@@ -10,6 +10,8 @@ general {
         colors = true
         interval = 5
         separator = "    |    "
+        # needed for the <span> around the battery %icon
+        markup = "pango"
 }
 
 order += "volume"
@@ -17,6 +19,7 @@ order += "volume"
 # order += "ipv6"
 order += "wireless _first_"
 order += "ethernet _first_"
+order += "claude_usage"
 order += "battery all"
 order += "disk /"
 # order += "load"
@@ -48,8 +51,13 @@ ethernet _first_ {
         format_down = "E: down"
 }
 
+# only available in this fork (~/code/i3status), see "man i3status"
+claude_usage {
+        format = "Claude %5h_left (%5h_reset_at) / %7d_left (%7d_reset_at) %stale"
+}
+
 battery all {
-        format = "%status %percentage %remaining"
+        format = "%status <span size='14pt' rise='-2500'> %icon </span> %percentage %remaining"
         low_threshold = 15
         threshold_type = percentage
 }
@@ -69,7 +77,8 @@ cpu_temperature 0 {
 }
 
 memory {
-        format = "%used/%available GB"
+        format = "%used / %available"
+        prefix_type = "decimal"
         threshold_degraded = "1G"
         format_degraded = "MEMORY < %available"
 

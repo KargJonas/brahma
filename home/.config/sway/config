@@ -301,7 +301,8 @@ bar {
     position bottom
 
     # When the status_command prints a new line to stdout, swaybar updates.
-    status_command i3status
+    # self-built from ~/code/i3status (claude_usage module, battery %icon)
+    status_command /home/jonas/.local/bin/i3status
     # status_command i3status -c /home/jonas/.config/i3status/config
 
     colors {
