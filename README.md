@@ -5,7 +5,7 @@ Single-command system setup.
 ## Install
 
 ```bash
-git clone git@github.com:KargJonas/brahma.git ~/code/brahma
+git clone https://github.com/KargJonas/brahma.git ~/code/brahma
 cd ~/code/brahma
 ./setup.sh
 
@@ -13,6 +13,7 @@ cd ~/code/brahma
 ```
 
 This
+- Asks for your git name/email (stored in untracked `~/.gitconfig.local`)
 - Installs a few packages
 - Symlinks dotfiles from `home/` to `~/`
 - Enables podman and libvirt

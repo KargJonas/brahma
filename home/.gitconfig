@@ -1,6 +1,6 @@
-[user]
-	email = 30984652+KargJonas@users.noreply.github.com
-	name = Jonas Karg
+# Identity lives in an untracked per-machine file (created by setup.sh)
+[include]
+	path = ~/.gitconfig.local
 [core]
 	editor = vim
 [pull]

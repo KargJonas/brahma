@@ -5,6 +5,17 @@ msg() { printf '\n\033[33;1m  Info\033[00m  %s\n\n' "$*"; }
 sudo -v
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+# Git identity is kept out of the public repo, in ~/.gitconfig.local
+if [ -f ~/.gitconfig.local ]; then
+  msg 'Git identity already configured'
+else
+  msg 'Configuring git identity (~/.gitconfig.local)'
+  read -rp 'Git name: ' git_name
+  read -rp 'Git email (GitHub noreply recommended): ' git_email
+  git config -f ~/.gitconfig.local user.name "$git_name"
+  git config -f ~/.gitconfig.local user.email "$git_email"
+fi
+
 msg 'Installing packages'
 sudo pacman -Syu --needed --noconfirm \
     base-devel \
