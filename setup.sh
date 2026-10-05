@@ -27,7 +27,6 @@ sudo pacman -Syu --needed --noconfirm \
     waybar \
     wmenu \
     fuzzel \
-    i3status \
     mako \
     batsignal \
     nwg-displays \
@@ -63,6 +62,15 @@ yay -S --needed --noconfirm \
     localsend-bin \
     ivpn ivpn-ui \
     spotify
+
+# Built from the fork (pkg/i3status), replacing Arch's i3status; --ask=4
+# answers yes to removing it, which --noconfirm alone declines
+msg 'Building i3status (KargJonas fork)'
+(
+  cd pkg/i3status
+  makepkg -srf --noconfirm
+  sudo pacman -U --needed --noconfirm --ask=4 "$(makepkg --packagelist)"
+)
 
 msg 'Setting up virtualization'
 yay -S --needed --noconfirm \

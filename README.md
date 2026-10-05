@@ -15,6 +15,7 @@ cd ~/code/brahma
 This
 - Asks for your git name/email (stored in untracked `~/.gitconfig.local`)
 - Installs a few packages
+- Builds and installs i3status from [the fork](https://github.com/KargJonas/i3status) (`pkg/i3status`), replacing Arch's
 - Symlinks dotfiles from `home/` to `~/`
 - Enables podman and libvirt
 - Adds `scripts/` to PATH

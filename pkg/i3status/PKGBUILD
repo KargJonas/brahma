@@ -1,0 +1,32 @@
+# i3status from github.com/KargJonas/i3status (branch custom-modules): the
+# vpn and claude_usage modules, click events. Replaces Arch's i3status.
+pkgname=i3status-kargjonas
+pkgver=2.15.r897.g3681fd4
+pkgrel=1
+pkgdesc='Generates status bar to use with i3bar, swaybar (KargJonas fork)'
+arch=(x86_64)
+url='https://github.com/KargJonas/i3status'
+license=(BSD-3-Clause)
+depends=(alsa-lib confuse curl libnl libpulse yajl)
+makedepends=(asciidoc git meson xmlto)
+provides=(i3status)
+conflicts=(i3status)
+options=(!debug)
+source=('i3status::git+https://github.com/KargJonas/i3status.git#branch=custom-modules')
+sha256sums=('SKIP')
+
+pkgver() {
+  cd i3status
+  printf '%s.r%s.g%s' "$(sed -n "s/^ *version: '\(.*\)',/\1/p" meson.build)" \
+    "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  arch-meson i3status build -Dmans=true
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+  install -Dm644 i3status/LICENSE -t "$pkgdir/usr/share/licenses/$pkgname"
+}

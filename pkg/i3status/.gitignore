@@ -1,0 +1,5 @@
+# makepkg output
+/i3status/
+/src/
+/pkg/
+*.pkg.tar.*
