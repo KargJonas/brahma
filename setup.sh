@@ -50,7 +50,8 @@ sudo pacman -Syu --needed --noconfirm \
     podman \
     distrobox \
     github-cli \
-    timeshift
+    timeshift \
+    polkit-gnome
 
 # might switch to snap/flatpak someday
 # because of AUR security concerns

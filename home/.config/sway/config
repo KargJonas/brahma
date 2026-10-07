@@ -289,6 +289,9 @@ exec mako
 # warn at 20%, critical at 10%, hibernate at 5%
 exec batsignal -w 20 -c 10 -d 5 -D "systemctl hibernate"
 
+# polkit authentication agent (password prompts for pkexec, e.g. timeshift)
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+
 
 
 ################################
