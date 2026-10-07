@@ -53,6 +53,17 @@ sudo pacman -Syu --needed --noconfirm \
     timeshift \
     polkit-gnome
 
+# AUR helper, bootstrapped from the AUR itself (prebuilt yay-bin)
+if command -v yay >/dev/null; then
+  msg 'yay already installed'
+else
+  msg 'Installing yay'
+  YAY_DIR=$(mktemp -d)
+  git clone https://aur.archlinux.org/yay-bin.git "$YAY_DIR"
+  (cd "$YAY_DIR" && makepkg -si --noconfirm)
+  rm -rf "$YAY_DIR"
+fi
+
 # might switch to snap/flatpak someday
 # because of AUR security concerns
 yay -S --needed --noconfirm \
