@@ -33,6 +33,7 @@ sudo pacman -Syu --needed --noconfirm \
     gammastep \
     neovim \
     firefox \
+    chromium \
     gimp \
     alacritty \
     brightnessctl \
