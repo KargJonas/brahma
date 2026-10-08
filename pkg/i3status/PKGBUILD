@@ -1,7 +1,7 @@
 # i3status from github.com/KargJonas/i3status (branch custom-modules): the
 # vpn and claude_usage modules, click events. Replaces Arch's i3status.
 pkgname=i3status-kargjonas
-pkgver=2.15.r897.g3681fd4
+pkgver=2.15.r898.g9e5efc5
 pkgrel=1
 pkgdesc='Generates status bar to use with i3bar, swaybar (KargJonas fork)'
 arch=(x86_64)
