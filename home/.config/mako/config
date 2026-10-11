@@ -1,0 +1,6 @@
+# Dismiss notifications after 7 seconds (mako's default is 0 = never)
+default-timeout=7000
+
+# Keep critical notifications (e.g. low battery) until clicked
+[urgency=critical]
+default-timeout=0
