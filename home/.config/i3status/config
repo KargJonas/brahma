@@ -20,6 +20,7 @@ order += "volume master"
 order += "wireless _first_"
 order += "ethernet _first_"
 order += "vpn"
+order += "synology_drive"
 order += "claude_usage"
 order += "battery all"
 order += "disk /"
@@ -69,6 +70,14 @@ vpn {
         # left click toggles homebase
         connect = "nmcli connection up homebase"
         disconnect = "nmcli connection down homebase"
+}
+
+# only available in this fork (~/code/i3status), see "man i3status"
+synology_drive {
+        format_synced = "Drive: synced"
+        format_syncing = "Drive: syncing"
+        format_offline = "Drive: offline, synced %age ago"
+        format_down = "Drive: not running, synced %age ago"
 }
 
 battery all {
