@@ -29,7 +29,7 @@ This
 | Command          | Short Command | Does                                                |
 | ---------------- | ------------- | --------------------------------------------------- |
 | `sys power`      | `sys p`       | poweroff / reboot / suspend / lock / logout         |
-| `sys brightness` | `sys b`       | set laptop + external (DDC/CI) screen brightness    |
+| `sys brightness` | `sys b`       | set laptop + external (DDC/CI) screen brightness; `0` turns screens off until input |
 | `sys gamma`      | `sys g`       | screen color temperature (eye comfort)              |
 | `sys volume`     | `sys v`       | volume up / down / mute                             |
 | `sys profile`    | `sys f`       | power profile (performance / balanced / saver)      |

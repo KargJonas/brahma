@@ -31,6 +31,7 @@ sudo pacman -Syu --needed --noconfirm \
     batsignal \
     nwg-displays \
     gammastep \
+    swayidle \
     neovim \
     firefox \
     chromium \

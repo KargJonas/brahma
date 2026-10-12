@@ -34,7 +34,19 @@ ddc_brightness() {
   done
 }
 
+# Power off every output until the next key press or pointer motion.
+# The timeout fires after 1s without input; the resume hook powers the outputs
+# back on and stops this swayidle ($PPID, since -w runs hooks as its children).
+screen_off() {
+  command -v swayidle >/dev/null || { msg 'Install swayidle'; return 1; }
+  msg 'Screen off'
+  setsid swayidle -w \
+    timeout 1 'swaymsg "output * power off"' \
+    resume 'swaymsg "output * power on"; kill $PPID' >/dev/null 2>&1 &
+}
+
 sys_brightness() {
+  [[ "$1" == 0 ]] && { screen_off; return; }
   command -v brightnessctl >/dev/null || { msg 'Install brightnessctl'; return 1; }
   if [[ "$1" =~ ^[0-9]+$ ]]; then
     local n=$1; (( n<10 )) && n=10; (( n>100 )) && n=100
@@ -124,7 +136,7 @@ sys_monitor() {
 sys_usage() {
   printf '\n\033[33;1m  sys\033[00m  system control  -  usage: sys <command> [arg]\n\n'
   printf '  \033[1mpower\033[00m      p   poweroff|p  reboot|r  suspend|s  lock|l  exit|e\n'
-  printf '  \033[1mbrightness\033[00m b   <10-100>  up|u  down|d  max|h  min|l\n'
+  printf '  \033[1mbrightness\033[00m b   0 (off)  <10-100>  up|u  down|d  max|h  min|l\n'
   printf '  \033[1mgamma\033[00m      g   <1000-25000>  reset|r\n'
   printf '  \033[1mvolume\033[00m     v   <0-100>  up|u  down|d  mute|m  toggle|t\n'
   printf '  \033[1mprofile\033[00m    f   performance|p  balanced|b  power-saver|s\n'
