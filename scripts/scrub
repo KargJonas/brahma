@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# scrub [dir]         list images under dir with leftover metadata, one per line
+# scrub purge [dir]   strip it (keeps orientation + color profile)
+# scrub -h|--help     show this help
+
+msg() { printf '\n\033[33;1m  Scrub\033[00m  %s\n\n' "$*"; }
+
+case "$1" in -h | --help) sed -n '3,5s/^# //p' "$0"; exit ;; esac
+
+command -v exiftool >/dev/null || { msg 'Install exiftool (perl-image-exiftool)'; exit 1; }
+
+EXT=(-ext jpg -ext jpeg -ext png -ext webp -ext heic -ext avif -ext tif -ext tiff -ext gif)
+
+# image structure and what purge keeps, not worth reporting
+KEEP=(--File:all --ExifTool:all --Composite:all --ICC_Profile:all
+  --IFD0:Orientation --IFD0:YCbCrPositioning
+  --PNG:ImageWidth --PNG:ImageHeight --PNG:BitDepth --PNG:ColorType --PNG:Compression
+  --PNG:Filter --PNG:Interlace --PNG:Palette --PNG:WhitePointX --PNG:WhitePointY
+  --PNG:RedX --PNG:RedY --PNG:GreenX --PNG:GreenY --PNG:BlueX --PNG:BlueY)
+
+# <flags>  <file>, one letter per kind of metadata found, after a legend
+list() {
+  exiftool -r -s -G0:1 "${EXT[@]}" "${KEEP[@]}" "$1" | awk '
+    function out(  f, i) {
+      for (i = 1; i <= length(KINDS); i++) f = f (substr(KINDS, i, 1) in found ? substr(KINDS, i, 1) : "-")
+      if (f ~ /^-+$/) return
+      if (!n++) print "G gps  C camera  D date  A author  S software  O other\n"
+      print f "  " file
+    }
+    BEGIN { KINDS = "GCDASO" }
+    /^======== / { if (file != "") out(); file = substr($0, 10); delete found; next }
+    / : / {
+      g = $1; t = $2
+      if (g ~ /GPS/ || t ~ /GPS|Location|City|Country/) k = "G"
+      else if (g ~ /MakerNotes/ || t ~ /^(Make|Model)$|Serial|Lens/) k = "C"
+      else if (t ~ /Software|Toolkit|CreatorTool|History/) k = "S"
+      else if (t ~ /Artist|Creator|Author|Copyright|Rights|Owner|By-line/) k = "A"
+      else if (tolower(t) ~ /date|time/) k = "D"
+      else k = "O"
+      found[k]
+    }
+    END { if (file != "") out() }'
+}
+
+case "$1" in
+  purge | p)
+    list "${2:-.}"
+    exiftool -q -q -r "${EXT[@]}" -all= -tagsfromfile @ -Orientation -icc_profile -overwrite_original "${2:-.}"
+    ;;
+  *) list "${1:-.}" ;;
+esac

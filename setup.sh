@@ -44,6 +44,8 @@ sudo pacman -Syu --needed --noconfirm \
     wl-clipboard \
     wireplumber \
     power-profiles-daemon \
+    perl-image-exiftool \
+    imagemagick \
     stow \
     vlc \
     discord \
@@ -127,6 +129,12 @@ else
   sudo usermod -aG i2c "$USER"
   msg 'Added to i2c group for external monitor brightness (re-login required)'
 fi
+
+# ly sources /etc/profile and ~/.bash_profile on login, so the session gets the
+# full PATH (gdm doesn't for wayland, which hides e.g. /usr/bin/vendor_perl)
+msg 'Setting ly as display manager (active after reboot)'
+systemctl is-enabled -q gdm.service 2>/dev/null && sudo systemctl disable gdm.service
+sudo systemctl enable ly@tty2.service
 
 msg 'Configuring firewall'
 sudo firewall-cmd --zone=public --add-port=53317/tcp --permanent # LocalSend

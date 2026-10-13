@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# shrink [dir] [px]      list images under dir: resolution, file size, * if fit would shrink it
+# shrink fit [dir] [px]  scale down to px on the long edge (default 2048), further until under 800K
+# shrink -h|--help       show this help
+
+msg() { printf '\n\033[33;1m  Shrink\033[00m  %s\n\n' "$*"; }
+
+case "$1" in -h | --help) sed -n '3,5s/^# //p' "$0"; exit ;; esac
+
+command -v magick >/dev/null || { msg 'Install imagemagick'; exit 1; }
+
+LIMIT=$((800 * 1024))
+FIT=
+[[ $1 == fit || $1 == f ]] && { FIT=1; shift; }
+DIR=. PX=2048
+for a; do [[ $a =~ ^[0-9]+$ ]] && PX=$a || DIR=$a; done
+
+EXT=(jpg jpeg png webp heic avif tif tiff)
+NAMES=()
+for e in "${EXT[@]}"; do NAMES+=(-o -iname "*.$e"); done
+
+# <w> <h> <bytes> <file>, first frame only
+info() {
+  find "$DIR" -type f \( "${NAMES[@]:1}" \) -print0 |
+    xargs -0r magick identify -ping -format '%[scene] %w %h %B %i\n' 2>/dev/null |
+    sed -n 's/^0 //p'
+}
+
+over() { (( $1 > PX || $2 > PX || $3 > LIMIT )); }
+size() { numfmt --to=iec "$1"; }
+
+list() {
+  local n=0 w h b f
+  while read -r w h b f; do
+    (( n++ )) || printf '* over %spx or %s, fit shrinks it\n\n' "$PX" "$(size $LIMIT)"
+    over "$w" "$h" "$b" && m='*' || m=' '
+    printf '%s %11s %6s  %s\n' "$m" "${w}x$h" "$(size "$b")" "$f"
+  done < <(info)
+}
+
+# re-encode each into a temp file next to the original, shrinking until it fits,
+# then replace the originals once confirmed
+fit() {
+  local w h b f s nw nh nb q i a before=0 after=0
+  while read -r w h b f; do
+    over "$w" "$h" "$b" || continue
+    tmp=$(mktemp -p "$(dirname "$f")" --suffix ".${f##*.}" .shrink.XXXXXX) || continue
+    s=$PX q=()
+    [[ ${f,,} == *.jp*g ]] && q=(-quality 85) # other formats do better at their encoder defaults
+    while :; do
+      magick -quiet "$f" -auto-orient -resize "${s}x$s>" "${q[@]}" "$tmp" || { echo "  failed  $f"; rm -f "$tmp"; continue 2; }
+      read -r nw nh nb < <(magick identify -ping -format '%w %h %B' "$tmp[0]")
+      (( nb <= LIMIT )) && break
+      s=$(awk "BEGIN { print int(($nw > $nh ? $nw : $nh) * sqrt($LIMIT / $nb) * 0.95) }")
+    done
+    FILES+=("$f") TMPS+=("$tmp")
+    tmp=
+    (( before += b, after += nb ))
+    printf '%11s %6s -> %11s %6s  %s\n' "${w}x$h" "$(size "$b")" "${nw}x$nh" "$(size "$nb")" "$f"
+  done < <(info)
+
+  (( ${#FILES[@]} )) || return 0
+  read -rp "$(printf '\nReplace %d images (%s -> %s)? [y/N] ' ${#FILES[@]} "$(size $before)" "$(size $after)")" a
+  [[ $a == [yY]* ]] || return
+  for i in "${!FILES[@]}"; do
+    touch -r "${FILES[i]}" "${TMPS[i]}"
+    chmod --reference="${FILES[i]}" "${TMPS[i]}"
+    mv -f -- "${TMPS[i]}" "${FILES[i]}"
+  done
+}
+
+FILES=() TMPS=()
+trap 'rm -f -- "$tmp" "${TMPS[@]}"' EXIT
+
+if [ -n "$FIT" ]; then fit; else list; fi
