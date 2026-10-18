@@ -112,6 +112,9 @@ bindsym $mod+n exec nautilus
 # Screenshots
 bindsym $mod+Print exec grim -g "$(slurp)" - | tee "~/Pictures/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png" | wl-copy
 
+# Screen recording: select a region to start, press again to stop
+bindsym $mod+Shift+Print exec sys record
+
 # Drag floating windows by holding down $mod and left mouse button.
 # Resize them with right mouse button + $mod.
 # Despite the name, also works for non-floating windows.
@@ -291,6 +294,9 @@ exec batsignal -w 20 -c 10 -d 5 -D "systemctl hibernate"
 
 # polkit authentication agent (password prompts for pkexec, e.g. timeshift)
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+
+# password manager
+exec keepassxc
 
 
 

@@ -41,6 +41,8 @@ sudo pacman -Syu --needed --noconfirm \
     ddcutil \
     grim \
     slurp \
+    wf-recorder \
+    libnotify \
     wl-clipboard \
     wireplumber \
     power-profiles-daemon \

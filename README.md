@@ -34,6 +34,7 @@ This
 | `sys volume`     | `sys v`       | volume up / down / mute                             |
 | `sys profile`    | `sys f`       | power profile (performance / balanced / saver)      |
 | `sys screenshot` | `sys s`       | region screenshot. Saved clipboard and `~/Pictures` |
+| `sys record`     | `sys r`       | region screen recording to `~/Videos`; run again to stop |
 | `sys monitor`    | `sys m`       | open display configurator                           |
 
 ## Sandbox
