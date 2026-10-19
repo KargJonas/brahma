@@ -2,7 +2,7 @@
 # vpn, claude_usage and synology_drive modules, click events. Replaces Arch's
 # i3status.
 pkgname=i3status-kargjonas
-pkgver=2.15.r900.g5d9a567
+pkgver=2.15.r901.gcbf6385
 pkgrel=1
 pkgdesc='Generates status bar to use with i3bar, swaybar (KargJonas fork)'
 arch=(x86_64)
