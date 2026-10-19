@@ -56,7 +56,8 @@ ethernet _first_ {
 
 # only available in this fork (~/code/i3status), see "man i3status"
 claude_usage {
-        format = "Claude %5h_left (%5h_reset_at) / %7d_left (%7d_reset_at) %stale"
+        format = "Claude %account: %5h_left (%5h_reset_at) / %7d_left (%7d_reset_at) %stale"
+        format_down = "Claude %account: %error"
 }
 
 # only available in this fork (~/code/i3status), see "man i3status"
