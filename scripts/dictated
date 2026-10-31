@@ -1,0 +1,64 @@
+#!/usr/bin/env -S ${HOME}/.local/share/dictate/venv/bin/python
+"""Push-to-talk dictation daemon.
+
+Keeps Parakeet TDT 0.6B v3 loaded in RAM. SIGUSR1 starts recording from the
+default microphone, SIGUSR2 stops it, transcribes, and types the text into the
+focused window with wtype.
+"""
+import os
+import signal
+import subprocess
+
+import numpy as np
+import sherpa_onnx
+import sounddevice as sd
+
+MODEL = os.path.expanduser(
+    "~/.local/share/dictate/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8"
+)
+RATE = 16000
+
+recognizer = sherpa_onnx.OfflineRecognizer.from_transducer(
+    encoder=f"{MODEL}/encoder.int8.onnx",
+    decoder=f"{MODEL}/decoder.int8.onnx",
+    joiner=f"{MODEL}/joiner.int8.onnx",
+    tokens=f"{MODEL}/tokens.txt",
+    model_type="nemo_transducer",
+    num_threads=4,
+)
+
+
+def transcribe(samples):
+    stream = recognizer.create_stream()
+    stream.accept_waveform(RATE, samples)
+    recognizer.decode_stream(stream)
+    return stream.result.text.strip()
+
+
+chunks = []
+mic = None
+
+signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGUSR1, signal.SIGUSR2})
+print("ready", flush=True)
+
+while True:
+    sig = signal.sigwait({signal.SIGUSR1, signal.SIGUSR2})
+    if sig == signal.SIGUSR1 and mic is None:
+        chunks = []
+        mic = sd.InputStream(
+            samplerate=RATE,
+            channels=1,
+            dtype="float32",
+            callback=lambda data, *_: chunks.append(data[:, 0].copy()),
+        )
+        mic.start()
+    elif sig == signal.SIGUSR2 and mic is not None:
+        mic.stop()
+        mic.close()
+        mic = None
+        if not chunks:
+            continue
+        text = transcribe(np.concatenate(chunks))
+        print(repr(text), flush=True)
+        if text:
+            subprocess.run(["wtype", "--", text + " "])

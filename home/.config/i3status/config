@@ -61,16 +61,16 @@ claude_usage {
 }
 
 # only available in this fork (~/code/i3status), see "man i3status"
-# homebase is always shown; other VPNs (IVPN: wgivpn, or tun0 for OpenVPN) only while up
+# homenet is always shown; other VPNs (IVPN: wgivpn, or tun0 for OpenVPN) only while up
 vpn {
-        interface = "wg_config"
-        name = "homebase"
+        interface = "homenet"
+        name = "homenet"
         format_up = "VPN: %name%others"
         format_down = "VPN: no %name%others"
         format_other = " + %name"
-        # left click toggles homebase
-        connect = "nmcli connection up homebase"
-        disconnect = "nmcli connection down homebase"
+        # left click toggles homenet
+        connect = "nmcli connection up homenet"
+        disconnect = "nmcli connection down homenet"
 }
 
 # only available in this fork (~/code/i3status), see "man i3status"

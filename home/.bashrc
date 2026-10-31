@@ -150,6 +150,8 @@ alias agu='sudo apt-get update'
 alias pmi='sudo pacman -S'
 alias pmr='sudo pacman -R'
 
+alias mzs='gio mount smb://smbadmin@ziggurat.lan/ziggurat'
+
 # sandbox-ignore
 
 # sandbox
@@ -169,6 +171,8 @@ export PATH="$HOME/opt/oss-cad-suite/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/opt/emsdk:$PATH"
 export PATH="$HOME/opt/emsdk/upstream/emscripten:$PATH"
+
+export PATH="$HOME/.bend/bin:$PATH" 
 
 [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
 

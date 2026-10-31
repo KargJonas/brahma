@@ -57,7 +57,16 @@ sudo pacman -Syu --needed --noconfirm \
     distrobox \
     github-cli \
     timeshift \
-    polkit-gnome
+    cifs-utils \
+    smbclient \
+    gvfs-smb \
+    libsecret \
+    python-gobject \
+    gnome-keyring \
+    polkit-gnome \
+    wtype \
+    uv \
+    portaudio
 
 # AUR helper, bootstrapped from the AUR itself (prebuilt yay-bin)
 if command -v yay >/dev/null; then
@@ -113,6 +122,20 @@ else
   sudo unzip -q "$TEMP_DIR/UbuntuMono.zip" -d "$FONT_DIR/UbuntuMono"
   rm -rf "$TEMP_DIR"
   sudo fc-cache -fv
+fi
+
+# Push-to-talk dictation (scripts/dictated, F9 in sway): Python deps in a venv
+# plus the Parakeet v3 model (German + English), both outside the repo
+DICTATE_DIR=~/.local/share/dictate
+DICTATE_MODEL=sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8
+msg 'Setting up dictation'
+uv venv -q --allow-existing --python 3.12 "$DICTATE_DIR/venv"
+VIRTUAL_ENV="$DICTATE_DIR/venv" uv pip install -q sherpa-onnx sounddevice numpy
+if [ -d "$DICTATE_DIR/$DICTATE_MODEL" ]; then
+  msg 'Dictation model already installed'
+else
+  curl -fL "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/$DICTATE_MODEL.tar.bz2" \
+    | tar xj -C "$DICTATE_DIR"
 fi
 
 if groups | grep -q '\blibvirt\b'; then

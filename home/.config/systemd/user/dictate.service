@@ -1,0 +1,6 @@
+[Unit]
+Description=Push-to-talk dictation (Parakeet v3)
+
+[Service]
+ExecStart=%h/brahma/scripts/dictated
+Restart=on-failure

@@ -37,6 +37,10 @@ This
 | `sys record`     | `sys r`       | region screen recording to `~/Videos`; run again to stop |
 | `sys monitor`    | `sys m`       | open display configurator                           |
 
+## Dictation
+
+Hold **F9** to talk, release to type the transcript into the focused window (German + English, auto-detected). `scripts/dictated` runs as the `dictate` user service (started by sway) and keeps [Parakeet TDT 0.6B v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) in RAM (~1 GB), so there is no load delay. The venv and model live in `~/.local/share/dictate`, installed by `setup.sh`. Transcripts are logged: `journalctl --user -u dictate -f`.
+
 ## Sandbox
 
 **`sandbox [-n] [-c] [-w] [-a] [dir]`** - drop into a throwaway podman Arch container with `dir` (default: cwd) mounted read-only at `~/host`. Network off, capabilities dropped, and memory/PID limits by default - handy for running untrusted code. Defined in `sandbox/sandbox.sh` (sourced from `.bashrc`).
