@@ -1,0 +1,5 @@
+{
+  "name": "latex",
+  "version": "0.1.0",
+  "description": "Renders LaTeX math in Claude's replies: display math as kitty images, inline math as Unicode"
+}

@@ -73,7 +73,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
+    xterm-color|*-256color|xterm-kitty) color_prompt=yes;;
 esac
 
 # This is where the PS1 is stitched together.
@@ -172,11 +172,30 @@ export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/opt/emsdk:$PATH"
 export PATH="$HOME/opt/emsdk/upstream/emscripten:$PATH"
 
-export PATH="$HOME/.bend/bin:$PATH" 
+export PATH="$HOME/.bend/bin:$PATH"
+
+# Claude Code mods kept in this repo (claude/latex: LaTeX math as kitty images)
+export CLAUDE_CODE_PLUGIN_DIRS="$HOME/brahma/claude/latex"
 
 [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
 
+# nvm.sh takes ~0.5s, so put the default node on PATH directly and load nvm
+# itself the first time it is called
 export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+__nvm_default() {
+  local want versions
+  want=$(cat "$NVM_DIR/alias/default" 2>/dev/null)
+  [ -d "$NVM_DIR/versions/node/$want" ] && { echo "$NVM_DIR/versions/node/$want"; return; }
+  versions=("$NVM_DIR"/versions/node/v*)
+  [ -d "${versions[0]}" ] && printf '%s\n' "${versions[@]}" | sort -V | tail -1
+}
+__nvm_node=$(__nvm_default)
+[ -n "$__nvm_node" ] && export PATH="$__nvm_node/bin:$PATH"
+unset -f __nvm_default; unset __nvm_node
+nvm() {
+  unset -f nvm
+  . "$NVM_DIR/nvm.sh"
+  . "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
 

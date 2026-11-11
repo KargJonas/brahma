@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# tex2png [max-columns] < math   render display math to a transparent PNG sized to whole
+#                                terminal cells; prints "<png> <columns> <rows>"
+#
+# Cached under ~/.cache/tex2png by content. Ubuntu Mono's cell is 1em tall and
+# 0.5em wide, so a row is one em of the terminal font and a cell is 2:1.
+# TEX2PNG_FG     text color (default: One Dark foreground, #abb2bf)
+# TEX2PNG_ASPECT cell height / width (default: 2)
+
+set -euo pipefail
+
+MAX_COLS=${1:-255}
+FG=${TEX2PNG_FG:-#abb2bf}
+ASPECT=${TEX2PNG_ASPECT:-2}
+DPI=350                                  # 1em of 10pt TeX = 48px, crisp after kitty scales it down
+CELL_H=$(( DPI * 10 * 1000 / 72270 ))    # px per row: one em
+CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/tex2png
+mkdir -p "$CACHE"
+
+TEX=$(cat)
+KEY=$(printf '%s\0%s\0%s\0%s' 1 "$FG" "$ASPECT" "$TEX" | sha1sum | cut -c1-16)
+OUT="$CACHE/$KEY-$MAX_COLS.png"
+META="$OUT.txt"
+[ -s "$META" ] && { cat "$META"; exit; }
+
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+
+RAW="$CACHE/$KEY.png"
+if [ ! -s "$RAW" ]; then
+  # align* for top-level & (outside environments like pmatrix), gather* otherwise; both take \\
+  BODY=$TEX
+  ENV=gather*
+  [[ $TEX =~ ^[[:space:]]*\\begin\{(align|gather|multline|equation|flalign|alignat)\*?\} ]] && ENV=
+  [ -n "$ENV" ] && perl -0ne 's/\\begin\{(\w+\*?)\}.*?\\end\{\1\}//gs; exit(!/(?<!\\)&/)' <<<"$TEX" && ENV=align*
+  [ -n "$ENV" ] && BODY="\\begin{$ENV}$TEX\\end{$ENV}"
+
+  cat >"$WORK/m.tex" <<EOF
+\\documentclass[10pt]{article}
+\\usepackage[paperwidth=60cm,paperheight=60cm,margin=1cm]{geometry}
+\\usepackage{amsmath,amssymb,amsfonts,mathtools,bm}
+\\pagestyle{empty}
+\\begin{document}
+$BODY
+\\end{document}
+EOF
+  if ! (cd "$WORK" && latex -interaction=nonstopmode -halt-on-error m.tex >/dev/null 2>&1); then
+    grep -A3 '^!' "$WORK/m.log" >&2 || echo 'latex failed' >&2
+    exit 1
+  fi
+  read -r R G B < <(printf '%d %d %d\n' "0x${FG:1:2}" "0x${FG:3:2}" "0x${FG:5:2}")
+  FGRGB=$(awk -v r="$R" -v g="$G" -v b="$B" 'BEGIN { printf "rgb %.3f %.3f %.3f", r/255, g/255, b/255 }')
+  dvipng -q -T tight -D "$DPI" -bg Transparent -fg "$FGRGB" -o "$WORK/m.png" "$WORK/m.dvi" >/dev/null
+  mv "$WORK/m.png" "$RAW"
+fi
+
+# Pad to whole cells (rows centred, left-aligned) so kitty fills the box without
+# stretching; shrink first when it is wider than the room it is given
+read -r W H < <(magick identify -format '%w %h\n' "$RAW")
+CELL_W=$(awk -v h="$CELL_H" -v a="$ASPECT" 'BEGIN { printf "%d", h / a }')
+COLS=$(( (W + CELL_W - 1) / CELL_W ))
+SRC=$RAW
+if (( COLS > MAX_COLS )); then
+  W2=$(( MAX_COLS * CELL_W ))
+  magick "$RAW" -resize "${W2}x" "$WORK/s.png"
+  SRC=$WORK/s.png
+  read -r W H < <(magick identify -format '%w %h\n' "$SRC")
+  COLS=$MAX_COLS
+fi
+ROWS=$(( (H + CELL_H - 1) / CELL_H ))
+magick "$SRC" -background none -gravity west -extent "$(( COLS * CELL_W ))x$(( ROWS * CELL_H ))" "$WORK/o.png"
+mv "$WORK/o.png" "$OUT"
+echo "$OUT $COLS $ROWS" | tee "$META"

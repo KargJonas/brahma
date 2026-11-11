@@ -96,6 +96,10 @@ spend-limited API key and treat it as less isolated than a plain `sandbox` run.
 
 **`dumpdir <dir> [depth] [exclude...]`** - dump a directory tree and file contents to stdout (skips `node_modules`, `.git`, etc.). Handy for feeding a codebase to an LLM.
 
+## LaTeX in Claude Code
+
+`claude/latex` is a Claude Code mod, loaded through `CLAUDE_CODE_PLUGIN_DIRS` in `.bashrc`. In kitty it draws display math in Claude's replies (`$$…$$`, `\[…\]`) as images, rendered by `claude/latex/bin/tex2png` (latex + dvipng, cached in `~/.cache/tex2png`). Inline math (`$…$`) becomes Unicode (`α² ≤ ∑ᵢ xᵢ`), as an image cannot sit inside a wrapped line. Tests: `claude plugin test claude/latex`.
+
 ## Structure
 
 ```
@@ -104,6 +108,7 @@ brahma/
 ├── scripts/      # Utility scripts (in PATH)
 │   ├── dumpdir
 │   └── sys
+├── claude/       # Claude Code mods (latex)
 ├── sandbox/      # Throwaway podman container (sandbox cmd)
 └── home/         # Config files (symlinked to ~/)
     ├── .bashrc
