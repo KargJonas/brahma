@@ -36,11 +36,7 @@ sudo pacman -Syu --needed --noconfirm \
     firefox \
     chromium \
     gimp \
-    kitty \
-    texlive-basic \
-    texlive-latex \
-    texlive-latexrecommended \
-    texlive-binextra \
+    alacritty \
     brightnessctl \
     ddcutil \
     grim \

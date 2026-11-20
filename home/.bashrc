@@ -73,7 +73,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|*-256color|xterm-kitty) color_prompt=yes;;
+    xterm-color|*-256color) color_prompt=yes;;
 esac
 
 # This is where the PS1 is stitched together.
@@ -173,9 +173,6 @@ export PATH="$HOME/opt/emsdk:$PATH"
 export PATH="$HOME/opt/emsdk/upstream/emscripten:$PATH"
 
 export PATH="$HOME/.bend/bin:$PATH"
-
-# Claude Code mods kept in this repo (claude/latex: LaTeX math as kitty images)
-export CLAUDE_CODE_PLUGIN_DIRS="$HOME/brahma/claude/latex"
 
 [ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
 
