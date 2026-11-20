@@ -94,6 +94,8 @@ spend-limited API key and treat it as less isolated than a plain `sandbox` run.
 
 ## Dumpdir
 
+**`claude-resume [-s session] [-d dir] [-q min] [-i min] [-n turns] [-b]`** - bring a Claude Code session back by itself after it went quiet, e.g. overnight on a usage limit. Waits until the session has written nothing for `-q` minutes (default 20), then resumes it headless (`claude -p --resume`) and retries every `-i` minutes (default 10) while that fails. Stops after `-n` resumed turns (default 6) or when the session answers `CLAUDE-RESUME-DONE`. `-b` runs it in the background; log in `~/.cache/claude-resume/<session>.log`. Without `-s` it takes the newest session of the directory. Close or restart a window still open on the session before typing in it again.
+
 **`dumpdir <dir> [depth] [exclude...]`** - dump a directory tree and file contents to stdout (skips `node_modules`, `.git`, etc.). Handy for feeding a codebase to an LLM.
 
 ## Structure

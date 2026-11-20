@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# claude-resume - bring a Claude Code session back by itself once it has gone
+# quiet, e.g. overnight after a usage limit: it waits until the session has
+# written nothing for a while, then asks it (headless) to carry on, and keeps
+# trying while the answer is an error (the limit has not reset yet).
+#
+#   claude-resume                     the newest session of the current directory
+#   claude-resume -s <session-id>     that session
+#   claude-resume -d <project dir>    a session of another directory
+#
+#   -i <min>   minutes between attempts while it fails            (default 10)
+#   -q <min>   minutes of silence before the session counts as stopped (default 20)
+#   -n <count> stop after this many turns that ran (failed attempts do not
+#              count: it retries until one runs)                  (default 6)
+#   -m <text>  what to tell it
+#   -p <mode>  permission mode of the resumed turns: auto, acceptEdits, ... (default auto)
+#   -b         go to the background; the log is ~/.cache/claude-resume/<session>.log
+#
+# A resumed turn runs without a terminal: it is appended to the session, so
+# `claude --resume <session-id>` shows it afterwards, but a window still open
+# on the session does not, and should be closed or restarted before typing in
+# it again. The session ends the loop itself by answering with a line
+# `CLAUDE-RESUME-DONE` when nothing is left to do.
+set -euo pipefail
+
+dir=$PWD session="" every=10 quiet=20 turns=6 mode=auto background=0
+message="You went quiet, possibly on a usage limit that has since reset. Nobody is at the keyboard. \
+Carry on with the work where it stopped. If everything asked for is finished or you need a person to go on, \
+say so briefly and end your answer with a line that says only CLAUDE-RESUME-DONE."
+while getopts "d:s:i:q:n:m:p:bh" opt; do
+    case $opt in
+        d) dir=$(realpath "$OPTARG") ;; s) session=$OPTARG ;; i) every=$OPTARG ;; q) quiet=$OPTARG ;;
+        n) turns=$OPTARG ;; m) message=$OPTARG ;; p) mode=$OPTARG ;; b) background=1 ;;
+        *) sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    esac
+done
+
+store="$HOME/.claude/projects/$(sed 's|[^A-Za-z0-9]|-|g' <<<"$dir")"
+[[ -d $store ]] || { echo "claude-resume: no Claude sessions for $dir ($store)" >&2; exit 1; }
+[[ -n $session ]] || session=$(basename "$(ls -t "$store"/*.jsonl | head -1)" .jsonl)
+transcript="$store/$session.jsonl"
+[[ -f $transcript ]] || { echo "claude-resume: no session $session in $store" >&2; exit 1; }
+
+log="$HOME/.cache/claude-resume/$session.log"
+mkdir -p "$(dirname "$log")"
+if ((background)); then
+    args=(-d "$dir" -s "$session" -i "$every" -q "$quiet" -n "$turns" -m "$message" -p "$mode")
+    setsid nohup "$0" "${args[@]}" >>"$log" 2>&1 &
+    echo "claude-resume: watching $session, log $log (pid $!)"
+    exit 0
+fi
+
+say() { echo "$(date '+%F %T') $*"; }
+say "watching $session in $dir: resume after ${quiet} min of silence, retry every ${every} min, at most $turns turns"
+done_turns=0
+while ((done_turns < turns)); do
+    idle=$((($(date +%s) - $(stat -c %Y "$transcript")) / 60))
+    if ((idle < quiet)); then
+        sleep $(((quiet - idle) * 60 + 5))
+        continue
+    fi
+    say "silent for $idle min: resuming"
+    if out=$(cd "$dir" && claude -p "$message" --resume "$session" --permission-mode "$mode" --output-format json 2>&1) &&
+        grep -q '"is_error":false' <<<"$out" &&
+        ! grep -o '"result":"[^"]\{0,200\}' <<<"$out" | grep -qiE 'usage limit|rate limit|limit reached|limit will reset|hit your limit'; then
+        done_turns=$((done_turns + 1))
+        say "turn $done_turns ended: $(grep -o '"result":"[^"]\{0,300\}' <<<"$out" | cut -c11-)"
+        if grep -q 'CLAUDE-RESUME-DONE' <<<"$out"; then
+            say "the session says it is done"
+            exit 0
+        fi
+    else
+        say "no: $(tail -c 300 <<<"$out" | tr '\n' ' ')"
+        sleep $((every * 60))
+    fi
+done
+say "$turns turns resumed: stopping"
